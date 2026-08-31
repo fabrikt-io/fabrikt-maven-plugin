@@ -1,0 +1,1 @@
+# fabrikt-maven-plugin
