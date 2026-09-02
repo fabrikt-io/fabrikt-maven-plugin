@@ -92,20 +92,7 @@ Override the Fabrikt/plugin version for compatibility or release verification wi
 
 ## Releases
 
-Releases track Fabrikt versions in lockstep. The release workflow accepts a `fabrikt-released` repository dispatch, can be started manually, and periodically checks the latest Fabrikt GitHub release as a fallback. It publishes only after the matching Fabrikt artifact is available from Maven Central and the full standalone build passes.
-
-Publishing requires the same Maven Central and signing secrets used by Fabrikt. See [the release workflow](.github/workflows/release.yml) for the required secret names and trigger payload.
-
-For immediate releases, the Fabrikt release process can dispatch after the matching artifact is visible in Maven Central. The token used by Fabrikt needs Actions access to this repository:
-
-```shell
-gh api repos/fabrikt-io/fabrikt-maven-plugin/dispatches \
-  --method POST \
-  -f event_type=fabrikt-released \
-  -F 'client_payload[version]=27.8.0'
-```
-
-The scheduled check provides recovery when that dispatch is missed. A release is skipped when the same plugin version already has a GitHub release, and concurrent release runs are serialized.
+Release documentation will be added when publishing is configured.
 
 ## License
 
