@@ -92,7 +92,7 @@ Override the Fabrikt/plugin version for compatibility or release verification wi
 
 ## Releases
 
-Release documentation will be added when publishing is configured.
+The plugin and Fabrikt share a version number. To release, set `fabriktVersion` in `gradle.properties` to the Fabrikt version you are targeting, merge that, then create a GitHub release whose tag is that version. The publish workflow builds, signs, and uploads to Maven Central staging, then registers the deployment with the Central Publisher Portal. Promotion to Maven Central stays manual at <https://central.sonatype.com/publishing>.
 
 ## License
 

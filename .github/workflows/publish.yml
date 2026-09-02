@@ -1,0 +1,74 @@
+name: Publish package to the Maven Central Repository
+# The job will be triggered when a release is created
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Check the release tag matches fabriktVersion
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          EXPECTED=$(grep '^fabriktVersion=' gradle.properties | cut -d= -f2)
+          if [[ "${TAG#v}" != "$EXPECTED" ]]; then
+            echo "::error::Release tag ${TAG#v} does not match fabriktVersion=$EXPECTED in gradle.properties"
+            echo "Set fabriktVersion in gradle.properties to the version you are releasing, merge that, then re-cut the release." >&2
+            exit 1
+          fi
+      - name: Publish to the Maven Central Repository
+        run: ./gradlew clean build publishMavenPluginPublicationToCentralStagingRepository
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPG_SIGNING_PASSWORD }}
+          OSSRH_USER_TOKEN_USERNAME: ${{ secrets.OSSRH_USER_TOKEN_USERNAME }}
+          OSSRH_USER_TOKEN_PASSWORD: ${{ secrets.OSSRH_USER_TOKEN_PASSWORD }}
+      - name: Notify Central of Upload (Manual Staging Promotion)
+        env:
+          OSSRH_USER_TOKEN_USERNAME: ${{ secrets.OSSRH_USER_TOKEN_USERNAME }}
+          OSSRH_USER_TOKEN_PASSWORD: ${{ secrets.OSSRH_USER_TOKEN_PASSWORD }}
+        run: |
+          # Sonatype indexes the upload asynchronously, so wait for it to show up
+          # instead of guessing how long indexing takes.
+          for attempt in $(seq 1 20); do
+            RESPONSE=$(curl --fail --silent --show-error \
+              -u "$OSSRH_USER_TOKEN_USERNAME:$OSSRH_USER_TOKEN_PASSWORD" \
+              "https://ossrh-staging-api.central.sonatype.com/manual/search/repositories?ip=any&profile_id=io.fabrikt")
+            OPEN_KEYS=$(jq -c '[.repositories[] | select(.state == "open") | .key]' <<< "$RESPONSE")
+            OPEN_COUNT=$(jq -r 'length' <<< "$OPEN_KEYS")
+            if [[ "$OPEN_COUNT" != "0" ]]; then break; fi
+            echo "Waiting for Sonatype to index the upload ($attempt/20)..."
+            sleep 15
+          done
+
+          if [[ "$OPEN_COUNT" == "0" ]]; then
+            echo "::error::No open io.fabrikt staging repository after 5 minutes - the upload did not register."
+            echo "Check the publish step above, then re-run this workflow from the release page." >&2
+            exit 1
+          fi
+
+          if [[ "$OPEN_COUNT" != "1" ]]; then
+            echo "::error::Expected 1 open io.fabrikt staging repository, found $OPEN_COUNT: $OPEN_KEYS"
+            echo "Every fabrikt-io project shares this Sonatype profile, so promoting one at random is unsafe." >&2
+            echo "Drop the stale repository, then re-run this workflow from the release page:" >&2
+            echo "  DELETE https://ossrh-staging-api.central.sonatype.com/manual/drop/repository/<key>" >&2
+            echo "These are staging repositories. They are a separate service from the deployments listed" >&2
+            echo "at https://central.sonatype.com/publishing, and will not appear there until promoted." >&2
+            exit 1
+          fi
+          REPO_KEY=$(jq -r '.[0]' <<< "$OPEN_KEYS")
+
+          echo "Notifying Sonatype to register $REPO_KEY in Central Publisher Portal..."
+          curl --fail --silent --show-error -X POST -H "Accept: application/json" \
+            -u "$OSSRH_USER_TOKEN_USERNAME:$OSSRH_USER_TOKEN_PASSWORD" \
+            "https://ossrh-staging-api.central.sonatype.com/manual/upload/repository/$REPO_KEY"
