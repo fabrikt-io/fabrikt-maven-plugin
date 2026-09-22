@@ -12,16 +12,23 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 final class CliArgumentMapper {
     private static final Pattern CAMEL_CASE_BOUNDARY = Pattern.compile("([a-z0-9])([A-Z])");
     private static final Pattern REMOTE_INPUT = Pattern.compile("(?i)^https?://.*");
-    private static final Set<String> RESERVED_ARGUMENTS = Set.of("api-file", "input-file", "output-directory");
+    private static final Set<String> RESERVED_ARGUMENTS =
+            Set.of("api-file", "input-file", "json-schema-file", "output-directory");
 
     List<String> map(
             Path projectDirectory,
             String inputFile,
+            String jsonSchemaFile,
             Path outputDirectory,
             PlexusConfiguration configuredArguments)
             throws MojoFailureException {
-        if (inputFile == null || inputFile.isBlank()) {
-            throw new MojoFailureException("inputFile must be configured for every Fabrikt execution");
+        boolean hasInputFile = inputFile != null && !inputFile.isBlank();
+        boolean hasJsonSchemaFile = jsonSchemaFile != null && !jsonSchemaFile.isBlank();
+        if (hasInputFile == hasJsonSchemaFile) {
+            throw new MojoFailureException("Configure exactly one of inputFile or jsonSchemaFile for every Fabrikt execution");
+        }
+        if (!hasJsonSchemaFile && hasValue(configuredArguments, "json-schema-root-name")) {
+            throw new MojoFailureException("arguments.jsonSchemaRootName requires jsonSchemaFile");
         }
         if (!hasValue(configuredArguments, "base-package")) {
             throw new MojoFailureException("arguments.basePackage must be configured for every Fabrikt execution");
@@ -30,8 +37,8 @@ final class CliArgumentMapper {
         List<String> result = new ArrayList<>();
         result.add("--output-directory");
         result.add(outputDirectory.toAbsolutePath().normalize().toString());
-        result.add("--api-file");
-        result.add(resolveInput(projectDirectory, inputFile));
+        result.add(hasInputFile ? "--api-file" : "--json-schema-file");
+        result.add(resolveInput(projectDirectory, hasInputFile ? inputFile : jsonSchemaFile));
 
         for (PlexusConfiguration argument : configuredArguments.getChildren()) {
             String argumentName = toKebabCase(argument.getName());
@@ -56,7 +63,10 @@ final class CliArgumentMapper {
         if (REMOTE_INPUT.matcher(inputFile).matches()) {
             return inputFile;
         }
-        return projectDirectory.resolve(inputFile).toAbsolutePath().normalize().toString();
+        int fragmentStart = inputFile.indexOf('#');
+        String path = fragmentStart < 0 ? inputFile : inputFile.substring(0, fragmentStart);
+        String fragment = fragmentStart < 0 ? "" : inputFile.substring(fragmentStart);
+        return projectDirectory.resolve(path).toAbsolutePath().normalize() + fragment;
     }
 
     private boolean hasValue(PlexusConfiguration configuration, String argumentName) {

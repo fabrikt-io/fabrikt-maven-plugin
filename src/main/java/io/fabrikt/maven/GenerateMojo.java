@@ -14,7 +14,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-/** Generates Kotlin sources from one OpenAPI specification using Fabrikt. */
+/** Generates Kotlin sources from one OpenAPI specification or JSON Schema using Fabrikt. */
 @Mojo(name = "generate", threadSafe = true)
 public final class GenerateMojo extends AbstractMojo {
     private final CliArgumentMapper argumentMapper;
@@ -22,8 +22,12 @@ public final class GenerateMojo extends AbstractMojo {
     private final FabriktProcessRunner processRunner;
 
     /** OpenAPI specification processed by this execution. */
-    @Parameter(required = true)
+    @Parameter
     private String inputFile;
+
+    /** JSON Schema document, optionally with a JSON Pointer fragment, processed by this execution. */
+    @Parameter
+    private String jsonSchemaFile;
 
     /** Directory below which Fabrikt writes its normal source tree. */
     @Parameter(defaultValue = "${project.build.directory}/generated-sources", required = true)
@@ -60,7 +64,7 @@ public final class GenerateMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         Path projectPath = projectDirectory.toPath();
         Path outputPath = outputDirectory.toPath();
-        List<String> cliArguments = argumentMapper.map(projectPath, inputFile, outputPath, arguments);
+        List<String> cliArguments = argumentMapper.map(projectPath, inputFile, jsonSchemaFile, outputPath, arguments);
         Path fabriktJar = jarLocator.locate(pluginDescriptor);
 
         int exitCode;
@@ -92,12 +96,14 @@ public final class GenerateMojo extends AbstractMojo {
 
     void configureForTest(
             String inputFile,
+            String jsonSchemaFile,
             File outputDirectory,
             PlexusConfiguration arguments,
             File projectDirectory,
             MavenProject project,
             PluginDescriptor pluginDescriptor) {
         this.inputFile = inputFile;
+        this.jsonSchemaFile = jsonSchemaFile;
         this.outputDirectory = outputDirectory;
         this.arguments = arguments;
         this.projectDirectory = projectDirectory;

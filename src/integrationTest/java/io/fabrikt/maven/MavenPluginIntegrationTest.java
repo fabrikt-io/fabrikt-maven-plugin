@@ -33,6 +33,18 @@ class MavenPluginIntegrationTest {
     }
 
     @Test
+    void generatesModelsFromNestedJsonSchema() throws Exception {
+        Path project = copyProject("json-schema");
+
+        MavenResult result = runMaven(project, "clean", "compile");
+
+        assertThat(result.exitCode()).as(result.output()).isZero();
+        Path generatedModel = find(project.resolve("target/generated-sources"), "InventoryRecord.kt");
+        assertThat(Files.readString(generatedModel)).contains("package com.example.inventory", "val id:");
+        assertThat(find(project.resolve("target/classes"), "InventoryRecord.class")).exists();
+    }
+
+    @Test
     void supportsExplicitExecutionAndLeavesCleanupToMavenClean() throws Exception {
         Path project = copyProject("manual-execution");
 
