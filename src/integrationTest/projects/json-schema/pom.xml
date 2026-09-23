@@ -52,6 +52,9 @@
                                 <targets>
                                     <value>http_models</value>
                                 </targets>
+                                <outputOpts>
+                                    <value>ADD_GENERATED_ANNOTATION</value>
+                                </outputOpts>
                             </arguments>
                         </configuration>
                     </execution>

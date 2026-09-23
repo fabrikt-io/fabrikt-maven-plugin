@@ -72,6 +72,19 @@ class CliArgumentMapperTest {
     }
 
     @Test
+    void mapsGeneratedAnnotationOutputOption() throws Exception {
+        DefaultPlexusConfiguration arguments = arguments("com.example.customer");
+        DefaultPlexusConfiguration outputOptions = new DefaultPlexusConfiguration("outputOpts");
+        outputOptions.addChild(value("value", "ADD_GENERATED_ANNOTATION"));
+        arguments.addChild(outputOptions);
+
+        List<String> result = mapper.map(
+                projectDirectory, "customer.yaml", null, projectDirectory.resolve("generated"), arguments);
+
+        assertThat(result).containsSubsequence("--output-opts", "ADD_GENERATED_ANNOTATION");
+    }
+
+    @Test
     void keepsRemoteInputUrlsUnchanged() throws Exception {
         List<String> result = mapper.map(
                 projectDirectory,

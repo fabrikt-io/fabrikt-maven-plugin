@@ -40,7 +40,12 @@ class MavenPluginIntegrationTest {
 
         assertThat(result.exitCode()).as(result.output()).isZero();
         Path generatedModel = find(project.resolve("target/generated-sources"), "InventoryRecord.kt");
-        assertThat(Files.readString(generatedModel)).contains("package com.example.inventory", "val id:");
+        assertThat(Files.readString(generatedModel))
+                .contains(
+                        "package com.example.inventory",
+                        "import javax.`annotation`.processing.Generated",
+                        "@Generated(",
+                        "val id:");
         assertThat(find(project.resolve("target/classes"), "InventoryRecord.class")).exists();
     }
 

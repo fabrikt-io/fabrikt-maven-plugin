@@ -15,7 +15,7 @@ Configure one execution for each OpenAPI specification or JSON Schema document:
 
 ```xml
 <properties>
-    <fabrikt.version>27.13.0</fabrikt.version>
+    <fabrikt.version>27.14.0</fabrikt.version>
 </properties>
 
 <build>
@@ -67,6 +67,14 @@ Configure one execution for each OpenAPI specification or JSON Schema document:
 ```
 
 Names inside `arguments` may be written in camelCase or with Fabrikt's existing kebab-case CLI names. Plugin-level arguments are shared defaults; execution-level values override them. Repeatable options use nested `value` elements, as shown for `targets` above. See Fabrikt's [configuration options](https://github.com/fabrikt-io/fabrikt#configuration-options) for the supported arguments.
+
+Fabrikt 27.14.0 adds `ADD_GENERATED_ANNOTATION` to `--output-opts`. Configure it as a repeatable Maven argument when generated types and top-level functions should carry `javax.annotation.processing.Generated`:
+
+```xml
+<outputOpts>
+    <value>ADD_GENERATED_ANNOTATION</value>
+</outputOpts>
+```
 
 Binding an execution to `generate-sources` runs generation in Maven's normal lifecycle. Leave out the phase when generation should only happen explicitly:
 
