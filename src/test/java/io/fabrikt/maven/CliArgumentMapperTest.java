@@ -32,6 +32,7 @@ class CliArgumentMapperTest {
         List<String> result = mapper.map(
                 projectDirectory,
                 "src/main/openapi/customer.yaml",
+                null,
                 projectDirectory.resolve("target/generated-sources"),
                 arguments);
 
@@ -60,7 +61,7 @@ class CliArgumentMapperTest {
         arguments.addChild(value("serialization-library", "JACKSON_3"));
 
         List<String> result = mapper.map(
-                projectDirectory, "customer.yaml", projectDirectory.resolve("generated"), arguments);
+                projectDirectory, "customer.yaml", null, projectDirectory.resolve("generated"), arguments);
 
         assertThat(result)
                 .containsSubsequence(
@@ -75,6 +76,7 @@ class CliArgumentMapperTest {
         List<String> result = mapper.map(
                 projectDirectory,
                 "https://example.com/customer.yaml",
+                null,
                 projectDirectory.resolve("generated"),
                 arguments("com.example.customer"));
 
@@ -86,14 +88,86 @@ class CliArgumentMapperTest {
         assertThatThrownBy(() -> mapper.map(
                         projectDirectory,
                         "customer.yaml",
+                        null,
                         projectDirectory.resolve("generated"),
                         new DefaultPlexusConfiguration("arguments")))
                 .isInstanceOf(MojoFailureException.class)
                 .hasMessage("arguments.basePackage must be configured for every Fabrikt execution");
     }
 
+    @Test
+    void mapsNestedJsonSchemaInputAndRootName() throws Exception {
+        DefaultPlexusConfiguration arguments = arguments("com.example.inventory");
+        arguments.addChild(value("jsonSchemaRootName", "InventoryRecord"));
+
+        List<String> result = mapper.map(
+                projectDirectory,
+                null,
+                "src/main/schema/manifest.yaml#/spec/schemaObject",
+                projectDirectory.resolve("generated"),
+                arguments);
+
+        assertThat(result).containsSubsequence(
+                        "--json-schema-file",
+                        projectDirectory.resolve("src/main/schema/manifest.yaml#/spec/schemaObject").toString(),
+                        "--base-package",
+                        "com.example.inventory",
+                        "--json-schema-root-name",
+                        "InventoryRecord")
+                .doesNotContain("--api-file");
+    }
+
+    @Test
+    void preservesJsonPointerSegmentsWhenResolvingLocalSchemaPath() throws Exception {
+        List<String> result = mapper.map(
+                projectDirectory,
+                null,
+                "manifest.yaml#/spec/../schemaObject",
+                projectDirectory.resolve("generated"),
+                arguments("com.example.inventory"));
+
+        assertThat(result).containsSubsequence(
+                "--json-schema-file", projectDirectory.resolve("manifest.yaml") + "#/spec/../schemaObject");
+    }
+
+    @Test
+    void rejectsJsonSchemaRootNameWithoutJsonSchemaInput() {
+        DefaultPlexusConfiguration arguments = arguments("com.example.inventory");
+        arguments.addChild(value("jsonSchemaRootName", "InventoryRecord"));
+
+        assertThatThrownBy(() -> mapper.map(
+                        projectDirectory,
+                        "customer.yaml",
+                        null,
+                        projectDirectory.resolve("generated"),
+                        arguments))
+                .isInstanceOf(MojoFailureException.class)
+                .hasMessage("arguments.jsonSchemaRootName requires jsonSchemaFile");
+    }
+
+    @Test
+    void requiresExactlyOneInputFile() {
+        assertThatThrownBy(() -> mapper.map(
+                        projectDirectory,
+                        null,
+                        null,
+                        projectDirectory.resolve("generated"),
+                        arguments("com.example.inventory")))
+                .isInstanceOf(MojoFailureException.class)
+                .hasMessage("Configure exactly one of inputFile or jsonSchemaFile for every Fabrikt execution");
+
+        assertThatThrownBy(() -> mapper.map(
+                        projectDirectory,
+                        "customer.yaml",
+                        "manifest.yaml",
+                        projectDirectory.resolve("generated"),
+                        arguments("com.example.inventory")))
+                .isInstanceOf(MojoFailureException.class)
+                .hasMessage("Configure exactly one of inputFile or jsonSchemaFile for every Fabrikt execution");
+    }
+
     @ParameterizedTest
-    @ValueSource(strings = {"outputDirectory", "output-directory"})
+    @ValueSource(strings = {"outputDirectory", "output-directory", "jsonSchemaFile", "json-schema-file"})
     void rejectsArgumentsManagedByThePlugin(String argumentName) {
         DefaultPlexusConfiguration arguments = arguments("com.example.customer");
         arguments.addChild(value(argumentName, "other"));
@@ -101,6 +175,7 @@ class CliArgumentMapperTest {
         assertThatThrownBy(() -> mapper.map(
                         projectDirectory,
                         "customer.yaml",
+                        null,
                         projectDirectory.resolve("generated"),
                         arguments))
                 .isInstanceOf(MojoFailureException.class)

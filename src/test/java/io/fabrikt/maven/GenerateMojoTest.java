@@ -102,6 +102,7 @@ class GenerateMojoTest {
         GenerateMojo mojo = new GenerateMojo(new CliArgumentMapper(), new FabriktJarLocator(), runner);
         mojo.configureForTest(
                 "customer.yaml",
+                null,
                 projectDirectory.resolve("target/generated-sources").toFile(),
                 arguments,
                 projectDirectory.toFile(),
