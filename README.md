@@ -15,7 +15,7 @@ Configure one execution for each OpenAPI specification or JSON Schema document:
 
 ```xml
 <properties>
-    <fabrikt.version>27.15.0</fabrikt.version>
+    <fabrikt.version>28.0.0</fabrikt.version>
 </properties>
 
 <build>
@@ -67,6 +67,24 @@ Configure one execution for each OpenAPI specification or JSON Schema document:
 ```
 
 Names inside `arguments` may be written in camelCase or with Fabrikt's existing kebab-case CLI names. Plugin-level arguments are shared defaults; execution-level values override them. Repeatable options use nested `value` elements, as shown for `targets` above. See Fabrikt's [configuration options](https://github.com/fabrikt-io/fabrikt#configuration-options) for the supported arguments.
+
+### Fabrikt 28 compatibility
+
+Fabrikt 28 uses Jackson 3 by default. Configure `JACKSON_2` explicitly when generated code must remain on Jackson 2; the former `JACKSON` value is deprecated. The Maven plugin forwards this and other Fabrikt options without maintaining a separate enum:
+
+```xml
+<serializationLibrary>JACKSON_2</serializationLibrary>
+```
+
+Fabrikt 28 also adds `RESPONSE_MEDIA_TYPE_FUNCTIONS`, `OPENAPI_BEARER_AUTHENTICATION`, and `OPENAPI_OAUTH2_AUTHENTICATION` to `httpClientOpts`; `EXCLUDE_READ_ONLY` and `EXCLUDE_WRITE_ONLY` to `httpModelOpts`; and new date, byte array, URI, UUID, and `Any` mappings to `typeOverrides`. The repeatable `httpModelAdditionalAnnotations` option adds annotations without arguments to generated HTTP models:
+
+```xml
+<httpModelAdditionalAnnotations>
+    <value>java.lang.Deprecated</value>
+</httpModelAdditionalAnnotations>
+```
+
+`RESILIENCE4J` is no longer a valid `httpClientOpts` value. The `SEALED_INTERFACES_FOR_ONE_OF` and `DISABLE_SEALED_INTERFACES_FOR_ONE_OF` model options were removed because sealed interfaces for `oneOf` are now always generated. See Fabrikt's [28.0.0 migration guide](https://github.com/fabrikt-io/fabrikt/blob/28.0.0/MIGRATION.md) for the complete list of breaking changes.
 
 Fabrikt 27.14.0 adds `ADD_GENERATED_ANNOTATION` to `--output-opts`. Configure it as a repeatable Maven argument when generated types and top-level functions should carry `javax.annotation.processing.Generated`:
 
