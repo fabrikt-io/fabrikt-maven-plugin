@@ -55,6 +55,9 @@
                                 <outputOpts>
                                     <value>ADD_GENERATED_ANNOTATION</value>
                                 </outputOpts>
+                                <httpModelAdditionalAnnotations>
+                                    <value>java.lang.Deprecated</value>
+                                </httpModelAdditionalAnnotations>
                             </arguments>
                         </configuration>
                     </execution>

@@ -43,7 +43,9 @@ class MavenPluginIntegrationTest {
         assertThat(Files.readString(generatedModel))
                 .contains(
                         "package com.example.inventory",
+                        "import java.lang.Deprecated",
                         "import javax.`annotation`.processing.Generated",
+                        "@Deprecated",
                         "@Generated(",
                         "val id:");
         assertThat(find(project.resolve("target/classes"), "InventoryRecord.class")).exists();

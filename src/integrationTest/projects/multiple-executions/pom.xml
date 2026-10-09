@@ -39,7 +39,7 @@
                 <version>@FABRIKT_VERSION@</version>
                 <configuration>
                     <arguments>
-                        <serializationLibrary>JACKSON</serializationLibrary>
+                        <serializationLibrary>JACKSON_2</serializationLibrary>
                         <validationLibrary>JAKARTA_VALIDATION</validationLibrary>
                         <targets>
                             <value>http_models</value>

@@ -85,6 +85,70 @@ class CliArgumentMapperTest {
     }
 
     @Test
+    void mapsFabrikt28Arguments() throws Exception {
+        DefaultPlexusConfiguration arguments = arguments("com.example.customer");
+        arguments.addChild(value("serializationLibrary", "JACKSON_2"));
+        arguments.addChild(values(
+                "httpClientOpts",
+                "RESPONSE_MEDIA_TYPE_FUNCTIONS",
+                "OPENAPI_BEARER_AUTHENTICATION",
+                "OPENAPI_OAUTH2_AUTHENTICATION"));
+        arguments.addChild(values("httpModelOpts", "EXCLUDE_READ_ONLY", "EXCLUDE_WRITE_ONLY"));
+        arguments.addChild(values(
+                "typeOverrides",
+                "DATETIME_AS_OFFSETDATETIME",
+                "BYTE_AS_BYTEARRAY",
+                "BINARY_AS_BYTEARRAY",
+                "URI_AS_URI",
+                "UUID_AS_UUID",
+                "DATE_AS_LOCALDATE",
+                "DATE_AS_KOTLINXLOCALDATE",
+                "ANY_AS_ANY"));
+        arguments.addChild(values(
+                "httpModelAdditionalAnnotations", "java.lang.Deprecated", "com.example.Validated"));
+
+        List<String> result = mapper.map(
+                projectDirectory, "customer.yaml", null, projectDirectory.resolve("generated"), arguments);
+
+        assertThat(result)
+                .containsSubsequence("--serialization-library", "JACKSON_2")
+                .containsSubsequence(
+                        "--http-client-opts",
+                        "RESPONSE_MEDIA_TYPE_FUNCTIONS",
+                        "--http-client-opts",
+                        "OPENAPI_BEARER_AUTHENTICATION",
+                        "--http-client-opts",
+                        "OPENAPI_OAUTH2_AUTHENTICATION")
+                .containsSubsequence(
+                        "--http-model-opts",
+                        "EXCLUDE_READ_ONLY",
+                        "--http-model-opts",
+                        "EXCLUDE_WRITE_ONLY")
+                .containsSubsequence(
+                        "--type-overrides",
+                        "DATETIME_AS_OFFSETDATETIME",
+                        "--type-overrides",
+                        "BYTE_AS_BYTEARRAY",
+                        "--type-overrides",
+                        "BINARY_AS_BYTEARRAY",
+                        "--type-overrides",
+                        "URI_AS_URI",
+                        "--type-overrides",
+                        "UUID_AS_UUID",
+                        "--type-overrides",
+                        "DATE_AS_LOCALDATE",
+                        "--type-overrides",
+                        "DATE_AS_KOTLINXLOCALDATE",
+                        "--type-overrides",
+                        "ANY_AS_ANY")
+                .containsSubsequence(
+                        "--http-model-additional-annotations",
+                        "java.lang.Deprecated",
+                        "--http-model-additional-annotations",
+                        "com.example.Validated");
+    }
+
+    @Test
     void keepsRemoteInputUrlsUnchanged() throws Exception {
         List<String> result = mapper.map(
                 projectDirectory,
@@ -204,6 +268,14 @@ class CliArgumentMapperTest {
     private DefaultPlexusConfiguration value(String name, String value) {
         DefaultPlexusConfiguration configuration = new DefaultPlexusConfiguration(name);
         configuration.setValue(value);
+        return configuration;
+    }
+
+    private DefaultPlexusConfiguration values(String name, String... values) {
+        DefaultPlexusConfiguration configuration = new DefaultPlexusConfiguration(name);
+        for (String value : values) {
+            configuration.addChild(value("value", value));
+        }
         return configuration;
     }
 }
