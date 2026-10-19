@@ -15,7 +15,7 @@ Configure one execution for each OpenAPI specification or JSON Schema document:
 
 ```xml
 <properties>
-    <fabrikt.version>28.0.0</fabrikt.version>
+    <fabrikt.version>28.1.1</fabrikt.version>
 </properties>
 
 <build>
