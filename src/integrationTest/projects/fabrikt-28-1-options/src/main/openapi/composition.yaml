@@ -1,0 +1,21 @@
+openapi: 3.0.3
+info:
+  title: Shared composition contracts
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    A:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+    B:
+      allOf:
+        - $ref: '#/components/schemas/A'
+        - type: object
+          required: [label]
+          properties:
+            label:
+              type: string

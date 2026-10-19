@@ -86,6 +86,24 @@ Fabrikt 28 also adds `RESPONSE_MEDIA_TYPE_FUNCTIONS`, `OPENAPI_BEARER_AUTHENTICA
 
 `RESILIENCE4J` is no longer a valid `httpClientOpts` value. The `SEALED_INTERFACES_FOR_ONE_OF` and `DISABLE_SEALED_INTERFACES_FOR_ONE_OF` model options were removed because sealed interfaces for `oneOf` are now always generated. See Fabrikt's [28.0.0 migration guide](https://github.com/fabrikt-io/fabrikt/blob/28.0.0/MIGRATION.md) for the complete list of breaking changes.
 
+Fabrikt 28.1 adds dependency snippet generation and three opt-in generation features. Generate a Maven or Gradle dependency snippet next to the generated source tree with `dependenciesGenerationMode`:
+
+```xml
+<dependenciesGenerationMode>MAVEN_NOTATION</dependenciesGenerationMode>
+```
+
+Use `OPENAPI_API_KEY_AUTHENTICATION` in `httpClientOpts` to generate helpers for header API-key security schemes. Use `REQUEST_RESPONSE_MODELS` and `SHARED_COMPOSITION_CONTRACTS` in `httpModelOpts` to generate directional request and response models and shared interfaces for explicit `allOf` composition relationships:
+
+```xml
+<httpClientOpts>
+    <value>OPENAPI_API_KEY_AUTHENTICATION</value>
+</httpClientOpts>
+<httpModelOpts>
+    <value>REQUEST_RESPONSE_MODELS</value>
+    <value>SHARED_COMPOSITION_CONTRACTS</value>
+</httpModelOpts>
+```
+
 Fabrikt 27.14.0 adds `ADD_GENERATED_ANNOTATION` to `--output-opts`. Configure it as a repeatable Maven argument when generated types and top-level functions should carry `javax.annotation.processing.Generated`:
 
 ```xml
