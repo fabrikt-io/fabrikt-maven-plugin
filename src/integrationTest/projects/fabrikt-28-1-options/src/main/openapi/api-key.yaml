@@ -1,0 +1,19 @@
+openapi: 3.0.3
+info:
+  title: API key client
+  version: 1.0.0
+paths:
+  /items:
+    get:
+      operationId: getItems
+      security:
+        - ApiKey: []
+      responses:
+        '204':
+          description: Success
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key

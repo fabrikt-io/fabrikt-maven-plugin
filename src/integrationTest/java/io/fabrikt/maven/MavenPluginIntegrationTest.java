@@ -52,6 +52,33 @@ class MavenPluginIntegrationTest {
     }
 
     @Test
+    void supportsFabrikt28_1Options() throws Exception {
+        Path project = copyProject("fabrikt-28-1-options");
+
+        MavenResult result = runMaven(project, "clean", "generate-sources");
+
+        assertThat(result.exitCode()).as(result.output()).isZero();
+
+        Path generatedSources = project.resolve("target/generated-sources");
+        assertThat(Files.readString(find(generatedSources, "PetRequest.kt")))
+                .contains("val secret:")
+                .doesNotContain("val id:");
+        assertThat(Files.readString(find(generatedSources, "PetResponse.kt")))
+                .contains("val id:")
+                .doesNotContain("val secret:");
+        assertThat(Files.readString(find(generatedSources, "AComposite.kt")))
+                .contains("interface AComposite", "val id:");
+        assertThat(Files.readString(find(generatedSources, "B.kt")))
+                .contains("data class B(", ") : AComposite");
+        assertThat(Files.readString(find(generatedSources, "ItemsClient.kt")))
+                .contains("getItemsWithApiKey", "apiKeyProvider:", "X-API-Key");
+        assertThat(Files.readString(generatedSources.resolve("dependencies")))
+                .contains(
+                        "<artifactId>jackson-databind</artifactId>",
+                        "<artifactId>jackson-module-kotlin</artifactId>");
+    }
+
+    @Test
     void supportsExplicitExecutionAndLeavesCleanupToMavenClean() throws Exception {
         Path project = copyProject("manual-execution");
 

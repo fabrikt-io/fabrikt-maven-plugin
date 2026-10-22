@@ -149,6 +149,27 @@ class CliArgumentMapperTest {
     }
 
     @Test
+    void mapsFabrikt28_1Arguments() throws Exception {
+        DefaultPlexusConfiguration arguments = arguments("com.example.customer");
+        arguments.addChild(value("dependenciesGenerationMode", "MAVEN_NOTATION"));
+        arguments.addChild(values("httpClientOpts", "OPENAPI_API_KEY_AUTHENTICATION"));
+        arguments.addChild(values(
+                "httpModelOpts", "REQUEST_RESPONSE_MODELS", "SHARED_COMPOSITION_CONTRACTS"));
+
+        List<String> result = mapper.map(
+                projectDirectory, "customer.yaml", null, projectDirectory.resolve("generated"), arguments);
+
+        assertThat(result)
+                .containsSubsequence("--dependencies-generation-mode", "MAVEN_NOTATION")
+                .containsSubsequence("--http-client-opts", "OPENAPI_API_KEY_AUTHENTICATION")
+                .containsSubsequence(
+                        "--http-model-opts",
+                        "REQUEST_RESPONSE_MODELS",
+                        "--http-model-opts",
+                        "SHARED_COMPOSITION_CONTRACTS");
+    }
+
+    @Test
     void keepsRemoteInputUrlsUnchanged() throws Exception {
         List<String> result = mapper.map(
                 projectDirectory,
