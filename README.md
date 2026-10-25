@@ -15,7 +15,7 @@ Configure one execution for each OpenAPI specification or JSON Schema document:
 
 ```xml
 <properties>
-    <fabrikt.version>28.2.0</fabrikt.version>
+    <fabrikt.version>28.3.0</fabrikt.version>
 </properties>
 
 <build>
@@ -102,6 +102,12 @@ Use `OPENAPI_API_KEY_AUTHENTICATION` in `httpClientOpts` to generate helpers for
     <value>REQUEST_RESPONSE_MODELS</value>
     <value>SHARED_COMPOSITION_CONTRACTS</value>
 </httpModelOpts>
+```
+
+Fabrikt 28.3 adds the `visibility` argument. Generated models, clients, controllers, and supporting declarations remain public by default. Set the argument to `INTERNAL` to generate an internal Kotlin API:
+
+```xml
+<visibility>INTERNAL</visibility>
 ```
 
 Fabrikt 27.14.0 adds `ADD_GENERATED_ANNOTATION` to `--output-opts`. Configure it as a repeatable Maven argument when generated types and top-level functions should carry `javax.annotation.processing.Generated`:

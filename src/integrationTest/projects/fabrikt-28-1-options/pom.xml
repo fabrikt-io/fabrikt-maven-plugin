@@ -56,6 +56,7 @@
                                 <httpModelOpts>
                                     <value>SHARED_COMPOSITION_CONTRACTS</value>
                                 </httpModelOpts>
+                                <visibility>INTERNAL</visibility>
                             </arguments>
                         </configuration>
                     </execution>
