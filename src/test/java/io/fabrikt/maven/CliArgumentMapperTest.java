@@ -181,6 +181,23 @@ class CliArgumentMapperTest {
     }
 
     @Test
+    void mapsAllOfParentModelOptions() throws Exception {
+        DefaultPlexusConfiguration arguments = arguments("com.example.customer");
+        arguments.addChild(values(
+                "httpModelOpts", "SEALED_CLASSES_FOR_ALL_OF", "OPEN_CLASSES_FOR_ALL_OF"));
+
+        List<String> result = mapper.map(
+                projectDirectory, "customer.yaml", null, projectDirectory.resolve("generated"), arguments);
+
+        assertThat(result)
+                .containsSubsequence(
+                        "--http-model-opts",
+                        "SEALED_CLASSES_FOR_ALL_OF",
+                        "--http-model-opts",
+                        "OPEN_CLASSES_FOR_ALL_OF");
+    }
+
+    @Test
     void keepsRemoteInputUrlsUnchanged() throws Exception {
         List<String> result = mapper.map(
                 projectDirectory,

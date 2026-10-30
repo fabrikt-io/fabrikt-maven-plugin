@@ -70,6 +70,10 @@ class MavenPluginIntegrationTest {
                 .contains("internal interface AComposite", "val id:");
         assertThat(Files.readString(find(generatedSources, "B.kt")))
                 .contains("internal data class B(", ") : AComposite");
+        assertThat(Files.readString(find(generatedSources, "Parent.kt")))
+                .contains("internal open class Parent(");
+        assertThat(Files.readString(find(generatedSources, "Child.kt")))
+                .contains("internal data class Child(", ") : Parent(");
         assertThat(Files.readString(find(generatedSources, "ItemsClient.kt")))
                 .contains("getItemsWithApiKey", "apiKeyProvider:", "X-API-Key");
         assertThat(Files.readString(generatedSources.resolve("dependencies")))
