@@ -55,7 +55,9 @@
                                 </targets>
                                 <httpModelOpts>
                                     <value>SHARED_COMPOSITION_CONTRACTS</value>
+                                    <value>OPEN_CLASSES_FOR_ALL_OF</value>
                                 </httpModelOpts>
+                                <visibility>INTERNAL</visibility>
                             </arguments>
                         </configuration>
                     </execution>

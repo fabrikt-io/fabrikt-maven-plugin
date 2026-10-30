@@ -19,3 +19,23 @@ components:
           properties:
             label:
               type: string
+    Parent:
+      type: object
+      required: [kind, name]
+      discriminator:
+        propertyName: kind
+        mapping:
+          child: '#/components/schemas/Child'
+      properties:
+        kind:
+          type: string
+        name:
+          type: string
+    Child:
+      allOf:
+        - $ref: '#/components/schemas/Parent'
+        - type: object
+          required: [value]
+          properties:
+            value:
+              type: string

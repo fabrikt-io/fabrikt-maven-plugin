@@ -15,7 +15,7 @@ Configure one execution for each OpenAPI specification or JSON Schema document:
 
 ```xml
 <properties>
-    <fabrikt.version>28.2.0</fabrikt.version>
+    <fabrikt.version>28.4.0</fabrikt.version>
 </properties>
 
 <build>
@@ -101,6 +101,20 @@ Use `OPENAPI_API_KEY_AUTHENTICATION` in `httpClientOpts` to generate helpers for
 <httpModelOpts>
     <value>REQUEST_RESPONSE_MODELS</value>
     <value>SHARED_COMPOSITION_CONTRACTS</value>
+</httpModelOpts>
+```
+
+Fabrikt 28.3 adds the `visibility` argument. Generated models, clients, controllers, and supporting declarations remain public by default. Set the argument to `INTERNAL` to generate an internal Kotlin API:
+
+```xml
+<visibility>INTERNAL</visibility>
+```
+
+Fabrikt 28.4 keeps discriminated `allOf` parent classes sealed by default. Use `OPEN_CLASSES_FOR_ALL_OF` with Jackson 2 or 3 when generated parents must remain extensible. `SEALED_CLASSES_FOR_ALL_OF` explicitly selects the default and takes precedence when both values are configured:
+
+```xml
+<httpModelOpts>
+    <value>OPEN_CLASSES_FOR_ALL_OF</value>
 </httpModelOpts>
 ```
 
