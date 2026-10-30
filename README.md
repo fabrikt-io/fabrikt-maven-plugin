@@ -15,7 +15,7 @@ Configure one execution for each OpenAPI specification or JSON Schema document:
 
 ```xml
 <properties>
-    <fabrikt.version>28.3.0</fabrikt.version>
+    <fabrikt.version>28.4.0</fabrikt.version>
 </properties>
 
 <build>
@@ -108,6 +108,14 @@ Fabrikt 28.3 adds the `visibility` argument. Generated models, clients, controll
 
 ```xml
 <visibility>INTERNAL</visibility>
+```
+
+Fabrikt 28.4 keeps discriminated `allOf` parent classes sealed by default. Use `OPEN_CLASSES_FOR_ALL_OF` with Jackson 2 or 3 when generated parents must remain extensible. `SEALED_CLASSES_FOR_ALL_OF` explicitly selects the default and takes precedence when both values are configured:
+
+```xml
+<httpModelOpts>
+    <value>OPEN_CLASSES_FOR_ALL_OF</value>
+</httpModelOpts>
 ```
 
 Fabrikt 27.14.0 adds `ADD_GENERATED_ANNOTATION` to `--output-opts`. Configure it as a repeatable Maven argument when generated types and top-level functions should carry `javax.annotation.processing.Generated`:
