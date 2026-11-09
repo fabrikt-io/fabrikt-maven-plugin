@@ -74,8 +74,23 @@ class MavenPluginIntegrationTest {
                 .contains("internal open class Parent(");
         assertThat(Files.readString(find(generatedSources, "Child.kt")))
                 .contains("internal data class Child(", ") : Parent(");
+        assertThat(Files.readString(find(generatedSources, "ApiSecurity.kt")))
+                .contains(
+                        "public object ApiSecurity",
+                        "\"ApiKeyAuth\" to SecurityScheme.ApiKey(Location.HEADER, \"X-API-Key\")",
+                        "\"BearerAuth\" to SecurityScheme.Http(\"bearer\", \"JWT\")",
+                        "Flow.CLIENT_CREDENTIALS",
+                        "\"getItems\" to");
         assertThat(Files.readString(find(generatedSources, "ItemsClient.kt")))
-                .contains("getItemsWithApiKey", "apiKeyProvider:", "X-API-Key");
+                .contains("getItems(")
+                .doesNotContain("getItemsWithApiKey", "apiKeyProvider:", "bearerTokenProvider:");
+        assertThat(Files.readString(find(generatedSources, "ContributorsController.kt")))
+                .contains(
+                        "fun getContributorVersion1(",
+                        "fun getContributorVersion2(",
+                        "version = \"1\"",
+                        "version = \"2\"")
+                .doesNotContain("fun getContributor(");
         assertThat(Files.readString(generatedSources.resolve("dependencies")))
                 .contains(
                         "<artifactId>jackson-databind</artifactId>",

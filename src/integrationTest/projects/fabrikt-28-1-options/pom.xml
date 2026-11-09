@@ -62,21 +62,41 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>generate-api-key-client</id>
+                        <id>generate-api-security-client</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputFile>src/main/openapi/api-key.yaml</inputFile>
+                            <inputFile>src/main/openapi/api-security.yaml</inputFile>
                             <arguments>
                                 <basePackage>com.example.security</basePackage>
                                 <targets>
                                     <value>client</value>
                                 </targets>
                                 <httpClientOpts>
-                                    <value>OPENAPI_API_KEY_AUTHENTICATION</value>
+                                    <value>OPENAPI_SECURITY</value>
                                 </httpClientOpts>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-versioned-spring-controller</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputFile>src/main/openapi/versioned-controller.yaml</inputFile>
+                            <arguments>
+                                <basePackage>com.example.versioning</basePackage>
+                                <targets>
+                                    <value>controllers</value>
+                                </targets>
+                                <httpControllerTarget>SPRING</httpControllerTarget>
+                                <httpControllerOpts>
+                                    <value>RESPONSE_MEDIA_TYPE_VERSIONS</value>
+                                </httpControllerOpts>
                             </arguments>
                         </configuration>
                     </execution>
