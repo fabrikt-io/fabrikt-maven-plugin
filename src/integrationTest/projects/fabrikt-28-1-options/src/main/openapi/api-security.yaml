@@ -1,0 +1,32 @@
+openapi: 3.0.3
+info:
+  title: OpenAPI security declaration
+  version: 1.0.0
+paths:
+  /items:
+    get:
+      operationId: getItems
+      security:
+        - BearerAuth: []
+        - ApiKeyAuth: []
+        - OAuth: [read:items]
+      responses:
+        '204':
+          description: Success
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://example.com/oauth/token
+          scopes:
+            read:items: Read items

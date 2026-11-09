@@ -88,11 +88,7 @@ class CliArgumentMapperTest {
     void mapsFabrikt28Arguments() throws Exception {
         DefaultPlexusConfiguration arguments = arguments("com.example.customer");
         arguments.addChild(value("serializationLibrary", "JACKSON_2"));
-        arguments.addChild(values(
-                "httpClientOpts",
-                "RESPONSE_MEDIA_TYPE_FUNCTIONS",
-                "OPENAPI_BEARER_AUTHENTICATION",
-                "OPENAPI_OAUTH2_AUTHENTICATION"));
+        arguments.addChild(values("httpClientOpts", "RESPONSE_MEDIA_TYPE_FUNCTIONS"));
         arguments.addChild(values("httpModelOpts", "EXCLUDE_READ_ONLY", "EXCLUDE_WRITE_ONLY"));
         arguments.addChild(values(
                 "typeOverrides",
@@ -114,11 +110,7 @@ class CliArgumentMapperTest {
                 .containsSubsequence("--serialization-library", "JACKSON_2")
                 .containsSubsequence(
                         "--http-client-opts",
-                        "RESPONSE_MEDIA_TYPE_FUNCTIONS",
-                        "--http-client-opts",
-                        "OPENAPI_BEARER_AUTHENTICATION",
-                        "--http-client-opts",
-                        "OPENAPI_OAUTH2_AUTHENTICATION")
+                        "RESPONSE_MEDIA_TYPE_FUNCTIONS")
                 .containsSubsequence(
                         "--http-model-opts",
                         "EXCLUDE_READ_ONLY",
@@ -152,7 +144,6 @@ class CliArgumentMapperTest {
     void mapsFabrikt28_1Arguments() throws Exception {
         DefaultPlexusConfiguration arguments = arguments("com.example.customer");
         arguments.addChild(value("dependenciesGenerationMode", "MAVEN_NOTATION"));
-        arguments.addChild(values("httpClientOpts", "OPENAPI_API_KEY_AUTHENTICATION"));
         arguments.addChild(values(
                 "httpModelOpts", "REQUEST_RESPONSE_MODELS", "SHARED_COMPOSITION_CONTRACTS"));
 
@@ -161,12 +152,25 @@ class CliArgumentMapperTest {
 
         assertThat(result)
                 .containsSubsequence("--dependencies-generation-mode", "MAVEN_NOTATION")
-                .containsSubsequence("--http-client-opts", "OPENAPI_API_KEY_AUTHENTICATION")
                 .containsSubsequence(
                         "--http-model-opts",
                         "REQUEST_RESPONSE_MODELS",
                         "--http-model-opts",
                         "SHARED_COMPOSITION_CONTRACTS");
+    }
+
+    @Test
+    void mapsFabrikt29Arguments() throws Exception {
+        DefaultPlexusConfiguration arguments = arguments("com.example.customer");
+        arguments.addChild(values("httpClientOpts", "OPENAPI_SECURITY"));
+        arguments.addChild(values("httpControllerOpts", "RESPONSE_MEDIA_TYPE_VERSIONS"));
+
+        List<String> result = mapper.map(
+                projectDirectory, "customer.yaml", null, projectDirectory.resolve("generated"), arguments);
+
+        assertThat(result)
+                .containsSubsequence("--http-client-opts", "OPENAPI_SECURITY")
+                .containsSubsequence("--http-controller-opts", "RESPONSE_MEDIA_TYPE_VERSIONS");
     }
 
     @Test

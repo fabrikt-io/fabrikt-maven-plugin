@@ -15,7 +15,7 @@ Configure one execution for each OpenAPI specification or JSON Schema document:
 
 ```xml
 <properties>
-    <fabrikt.version>28.4.0</fabrikt.version>
+    <fabrikt.version>29.0.0</fabrikt.version>
 </properties>
 
 <build>
@@ -66,65 +66,9 @@ Configure one execution for each OpenAPI specification or JSON Schema document:
 </build>
 ```
 
-Names inside `arguments` may be written in camelCase or with Fabrikt's existing kebab-case CLI names. Plugin-level arguments are shared defaults; execution-level values override them. Repeatable options use nested `value` elements, as shown for `targets` above. See Fabrikt's [configuration options](https://github.com/fabrikt-io/fabrikt#configuration-options) for the supported arguments.
+Names inside `arguments` may be written in camelCase or with Fabrikt's existing kebab-case CLI names. Plugin-level arguments are shared defaults; execution-level values override them. Repeatable options use nested `value` elements, as shown for `targets` above.
 
-### Fabrikt 28 compatibility
-
-Fabrikt 28 uses Jackson 3 by default. Configure `JACKSON_2` explicitly when generated code must remain on Jackson 2; the former `JACKSON` value is deprecated. The Maven plugin forwards this and other Fabrikt options without maintaining a separate enum:
-
-```xml
-<serializationLibrary>JACKSON_2</serializationLibrary>
-```
-
-Fabrikt 28 also adds `RESPONSE_MEDIA_TYPE_FUNCTIONS`, `OPENAPI_BEARER_AUTHENTICATION`, and `OPENAPI_OAUTH2_AUTHENTICATION` to `httpClientOpts`; `EXCLUDE_READ_ONLY` and `EXCLUDE_WRITE_ONLY` to `httpModelOpts`; and new date, byte array, URI, UUID, and `Any` mappings to `typeOverrides`. The repeatable `httpModelAdditionalAnnotations` option adds annotations without arguments to generated HTTP models:
-
-```xml
-<httpModelAdditionalAnnotations>
-    <value>java.lang.Deprecated</value>
-</httpModelAdditionalAnnotations>
-```
-
-`RESILIENCE4J` is no longer a valid `httpClientOpts` value. The `SEALED_INTERFACES_FOR_ONE_OF` and `DISABLE_SEALED_INTERFACES_FOR_ONE_OF` model options were removed because sealed interfaces for `oneOf` are now always generated. See Fabrikt's [28.0.0 migration guide](https://github.com/fabrikt-io/fabrikt/blob/28.0.0/MIGRATION.md) for the complete list of breaking changes.
-
-Fabrikt 28.1 adds dependency snippet generation and three opt-in generation features. Generate a Maven or Gradle dependency snippet next to the generated source tree with `dependenciesGenerationMode`:
-
-```xml
-<dependenciesGenerationMode>MAVEN_NOTATION</dependenciesGenerationMode>
-```
-
-Use `OPENAPI_API_KEY_AUTHENTICATION` in `httpClientOpts` to generate helpers for header API-key security schemes. Use `REQUEST_RESPONSE_MODELS` and `SHARED_COMPOSITION_CONTRACTS` in `httpModelOpts` to generate directional request and response models and shared interfaces for explicit `allOf` composition relationships:
-
-```xml
-<httpClientOpts>
-    <value>OPENAPI_API_KEY_AUTHENTICATION</value>
-</httpClientOpts>
-<httpModelOpts>
-    <value>REQUEST_RESPONSE_MODELS</value>
-    <value>SHARED_COMPOSITION_CONTRACTS</value>
-</httpModelOpts>
-```
-
-Fabrikt 28.3 adds the `visibility` argument. Generated models, clients, controllers, and supporting declarations remain public by default. Set the argument to `INTERNAL` to generate an internal Kotlin API:
-
-```xml
-<visibility>INTERNAL</visibility>
-```
-
-Fabrikt 28.4 keeps discriminated `allOf` parent classes sealed by default. Use `OPEN_CLASSES_FOR_ALL_OF` with Jackson 2 or 3 when generated parents must remain extensible. `SEALED_CLASSES_FOR_ALL_OF` explicitly selects the default and takes precedence when both values are configured:
-
-```xml
-<httpModelOpts>
-    <value>OPEN_CLASSES_FOR_ALL_OF</value>
-</httpModelOpts>
-```
-
-Fabrikt 27.14.0 adds `ADD_GENERATED_ANNOTATION` to `--output-opts`. Configure it as a repeatable Maven argument when generated types and top-level functions should carry `javax.annotation.processing.Generated`:
-
-```xml
-<outputOpts>
-    <value>ADD_GENERATED_ANNOTATION</value>
-</outputOpts>
-```
+The Maven plugin forwards Fabrikt arguments without maintaining a separate list of supported options. Fabrikt's [configuration options](https://github.com/fabrikt-io/fabrikt#configuration-options), [migration guide](https://github.com/fabrikt-io/fabrikt/blob/master/MIGRATION.md), and [release notes](https://github.com/fabrikt-io/fabrikt/releases) are the source of truth for available values and their behavior.
 
 Binding an execution to `generate-sources` runs generation in Maven's normal lifecycle. Leave out the phase when generation should only happen explicitly:
 
@@ -134,7 +78,7 @@ mvn fabrikt:generate@generate-customer-api
 
 `inputFile` accepts a path relative to the Maven project or an HTTP(S) URL. The default output directory is `${project.build.directory}/generated-sources`. After successful generation, existing `src/main/kotlin` and `src/test/kotlin` directories below it are registered as Maven source roots.
 
-For Fabrikt 27.13.0 and newer, use `jsonSchemaFile` instead of `inputFile` to generate models from a JSON Schema document. It accepts a path relative to the Maven project or an HTTP(S) URL, optionally followed by a JSON Pointer selecting a schema nested in a larger document:
+Use `jsonSchemaFile` instead of `inputFile` to generate models from a JSON Schema document. It accepts a path relative to the Maven project or an HTTP(S) URL, optionally followed by a JSON Pointer selecting a schema nested in a larger document:
 
 ```xml
 <configuration>

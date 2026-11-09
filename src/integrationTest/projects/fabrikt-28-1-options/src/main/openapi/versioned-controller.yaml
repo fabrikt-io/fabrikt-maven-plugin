@@ -1,0 +1,44 @@
+openapi: 3.0.3
+info:
+  title: Versioned Spring controller
+  version: 1.0.0
+paths:
+  /contributors/{id}:
+    get:
+      operationId: getContributor
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/x.example.contributor+json;version=1:
+              schema:
+                $ref: '#/components/schemas/ContributorV1'
+            application/x.example.contributor+json;version=2:
+              schema:
+                $ref: '#/components/schemas/ContributorV2'
+components:
+  schemas:
+    ContributorV1:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    ContributorV2:
+      type: object
+      required: [id, name, role]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
