@@ -1,0 +1,20 @@
+openapi: 3.0.3
+info:
+  title: Additional properties policy
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    OpenResult:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+    ClosedResult:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+      additionalProperties: false

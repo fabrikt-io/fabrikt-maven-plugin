@@ -91,6 +91,20 @@ class MavenPluginIntegrationTest {
                         "version = \"1\"",
                         "version = \"2\"")
                 .doesNotContain("fun getContributor(");
+        assertThat(Files.readString(find(generatedSources, "OpenResult.kt")))
+                .contains("JsonAnyGetter", "JsonAnySetter", "MutableMap<String, Any?>");
+        assertThat(Files.readString(find(generatedSources, "ClosedResult.kt")))
+                .doesNotContain("JsonAnyGetter", "JsonAnySetter", "MutableMap<String, Any?>");
+        Path generatedKotlinx = project.resolve("target/generated-kotlinx");
+        assertThat(Files.readString(find(generatedKotlinx, "OpenResult.kt")))
+                .contains(
+                        "@Serializable(with = OpenResult.Serializer::class)",
+                        "AdditionalPropertiesSerializer",
+                        "MutableMap<String, JsonElement>");
+        assertThat(Files.readString(find(generatedKotlinx, "ClosedResult.kt")))
+                .doesNotContain("AdditionalPropertiesSerializer", "MutableMap<String, JsonElement>");
+        assertThat(Files.readString(find(generatedKotlinx, "AdditionalPropertiesSerializer.kt")))
+                .contains("class AdditionalPropertiesSerializer<T : Any>");
         assertThat(Files.readString(generatedSources.resolve("dependencies")))
                 .contains(
                         "<artifactId>jackson-databind</artifactId>",

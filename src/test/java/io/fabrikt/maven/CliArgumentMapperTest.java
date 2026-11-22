@@ -173,6 +173,19 @@ class CliArgumentMapperTest {
                 .containsSubsequence("--http-controller-opts", "RESPONSE_MEDIA_TYPE_VERSIONS");
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"ONLY_WHEN_REQUESTED", "UNLESS_EXPLICITLY_DISABLED"})
+    void mapsAdditionalPropertiesMode(String mode) throws Exception {
+        DefaultPlexusConfiguration arguments = arguments("com.example.customer");
+        arguments.addChild(value("additionalProperties", mode));
+
+        List<String> result = mapper.map(
+                projectDirectory, "customer.yaml", null, projectDirectory.resolve("generated"), arguments);
+
+        assertThat(result)
+                .containsSubsequence("--additional-properties", mode);
+    }
+
     @Test
     void mapsFabrikt28_3Arguments() throws Exception {
         DefaultPlexusConfiguration arguments = arguments("com.example.customer");

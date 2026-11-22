@@ -100,6 +100,43 @@
                             </arguments>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>generate-implicit-additional-properties</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputFile>src/main/openapi/additional-properties.yaml</inputFile>
+                            <arguments>
+                                <basePackage>com.example.additionalproperties</basePackage>
+                                <targets>
+                                    <value>http_models</value>
+                                </targets>
+                                <serializationLibrary>JACKSON_3</serializationLibrary>
+                                <additionalProperties>UNLESS_EXPLICITLY_DISABLED</additionalProperties>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-kotlinx-implicit-additional-properties</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputFile>src/main/openapi/additional-properties.yaml</inputFile>
+                            <outputDirectory>${project.build.directory}/generated-kotlinx</outputDirectory>
+                            <arguments>
+                                <basePackage>com.example.additionalproperties.kotlinx</basePackage>
+                                <targets>
+                                    <value>http_models</value>
+                                </targets>
+                                <serializationLibrary>KOTLINX_SERIALIZATION</serializationLibrary>
+                                <additionalProperties>UNLESS_EXPLICITLY_DISABLED</additionalProperties>
+                            </arguments>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
